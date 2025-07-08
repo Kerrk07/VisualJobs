@@ -17,3 +17,6 @@ env/
 *.csv
 *.log
 *.sqlite3
+
+# Ignore macOS system file
+.DS_Store
