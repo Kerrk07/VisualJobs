@@ -10,18 +10,16 @@ This project is not meant for production or professional use — it's just a fun
 ## Project Structure
 
 ```
-
 VisualJobs/
 │
-├── app.py                # Main Dash app
-├── requirements.txt      # Python dependencies
-├── .env                  # Notion API credentials (not tracked in Git)
-├── .gitignore            # To exclude .env, **pycache**, etc.
-└── README.md             # Project overview
-
-````
-
-
+├── app.py              # Main Dash app
+├── requirements.txt    # Python dependencies
+├── .env                # Notion API credentials (not tracked by Git)
+├── .gitignore          # Git exclusions for env, cache, and system files
+├── README.md           # Project overview and usage
+└── images/
+    └── web.png         # Dashboard screenshot
+```
 
 ## What This Is For
 
@@ -75,7 +73,6 @@ Then open your browser to:
 
 ![VisualJobs Sankey Diagram](images/web.png)
 
----
 
 ## 🧪 Disclaimer
 
