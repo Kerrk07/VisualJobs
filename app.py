@@ -38,7 +38,7 @@ def parse_notion_response(pages):
             "Stage": props["Stage"]["status"]["name"] if props["Stage"]["status"] else "",
             "Follow-up": props["Follow-up Status"]["status"]["name"] if props["Follow-up Status"]["status"] else "",
             "Position": props["Position"]["rich_text"][0]["plain_text"] if props["Position"]["rich_text"] else "",
-            "Applied Date": props["Applied Date"]["rich_text"][0]["plain_text"] if props["Applied Date"]["rich_text"] else "",
+            "Applied_Date": props["Applied Date"]["rich_text"][0]["plain_text"] if props["Applied Date"]["rich_text"] else "",
             "Link": props["Link"]["url"] if props["Link"]["url"] else "",
         })
     return pd.DataFrame(records)
@@ -47,12 +47,30 @@ pages = fetch_notion_records(database_id)
 df = parse_notion_response(pages)
 
 # -------------------------------
-# 3. Create Sankey data
+# 3. Create Dashboard Data
+# -------------------------------
+total_apps = len(df)
+
+# % response: anything that is NOT 'No started'
+responded = df[df["Follow-up"] != "Not started"]
+response_rate = len(responded) / total_apps * 100 if total_apps else 0
+
+# % offer
+offers = df[df["Follow-up"] == "Offer"]
+offer_rate = len(offers) / total_apps * 100 if total_apps else 0
+
+# % accepted
+accepted = df[df["Follow-up"] == "Accepted"]
+accept_rate = len(accepted) / len(offers) * 100 if len(offers) else 0
+
+
+# -------------------------------
+# 4. Create Sankey data
 # -------------------------------
 def build_sankey_data(df):
     grouped = df.groupby(["Stage", "Follow-up"]).size().reset_index(name="count")
 
-    labels = list(pd.unique(grouped["Stage"].tolist() + grouped["Follow-up"].tolist()))
+    labels = pd.Series(grouped["Stage"].tolist() + grouped["Follow-up"].tolist()).unique().tolist()
     label_map = {label: i for i, label in enumerate(labels)}
 
     source = [label_map[row["Stage"]] for _, row in grouped.iterrows()]
@@ -71,9 +89,11 @@ def build_sankey_data(df):
 labels, source, target, value, customdata, detail_lookup = build_sankey_data(df)
 
 # -------------------------------
-# 4. Build Dash App
+# 5. Build Dash App
 # -------------------------------
 app = Dash(__name__)
+
+link_color = [f"rgba(0,0,200,0.1)"] * len(value)
 
 fig = go.Figure(go.Sankey(
     node=dict(label=labels, pad=15, thickness=20),
@@ -82,31 +102,45 @@ fig = go.Figure(go.Sankey(
         target=target,
         value=value,
         customdata=customdata,
-        hovertemplate="%{customdata}<br>Count: %{value}<extra></extra>"
+        hovertemplate="%{customdata}<br>Value: %{value}<extra></extra>",
+        color=link_color
     )
 ))
 
-app.layout = html.Div([
-    html.H2("🎯 VisualJobs – Notion Job Tracker Sankey"),
-    dcc.Graph(id="sankey", figure=fig),
-    html.Div(id="details", style={"whiteSpace": "pre-wrap", "marginTop": 20})
+summary_text = f"""
+Total Applications: {total_apps}
+Response Rate: {response_rate:.1f}%
+Offer Rate: {offer_rate:.1f}%
+Acceptance Rate: {accept_rate:.1f}%
+"""
+
+summary_text = html.Div([
+    html.P(f"📋 Total Applications: {total_apps}"),
+    html.P(f"📬 Response Rate: {response_rate:.1f}%"),
+    html.P(f"🎯 Offer Rate: {offer_rate:.1f}%"),
+    html.P(f"✅ Acceptance Rate: {accept_rate:.1f}%"),
 ])
 
-@app.callback(
-    Output("details", "children"),
-    Input("sankey", "clickData")
-)
-def show_details(clickData):
-    if clickData:
-        label = clickData["points"][0]["customdata"]
-        stage, followup = label.split(" → ")
-        df_sub = detail_lookup.get((stage, followup))
-        if df_sub is not None and not df_sub.empty:
-            return "\n".join(
-                f"{r.Company} | {r.Position} | {r['Applied Date']} | {r.Link}"
-                for r in df_sub.itertuples()
-            )
-    return "Click on a path to see detailed applications."
+app.layout = html.Div([
+    html.H1(
+    "VisualJobs",
+    style={
+        "fontFamily": "sans-serif",
+        "color": "rgba(0, 0, 0, 0.5)",
+        "textAlign": "center",
+        "fontSize": "48px"
+    }),
+    dcc.Graph(id="sankey", figure=fig),
+
+    html.Div(summary_text, id="summary", style={
+    "fontFamily": "sans-serif",
+    "color": "rgba(0, 0, 0, 0.5)",  # 50% opacity dark gray
+    "textAlign": "center",
+    "fontSize": "20px",
+    "lineHeight": "2",
+    "marginTop": "30px"
+    })
+])
 
 # -------------------------------
 # 5. Run
