@@ -59,6 +59,34 @@ NOTION_DATABASE_ID=your_database_id_here
 
 > ✅ Make sure your Notion integration is shared with the database!
 
+### 4. Design Your Notion Database
+
+Your Notion database should have the following properties to work with VisualJobs:
+
+| Property Name | Type | Description |
+|---------------|------|-------------|
+| **Company** | Title | Name of the company |
+| **Status** | Select | Current application status (e.g., Applied, Rejected, Interview, Offer) |
+| **Source** | Select | How you applied (e.g., Direct Apply, Recruiter, Referral) |
+| **Applied Date** | Date | When you submitted the application |
+
+**Example Status options:**
+- Applied
+- Rejected
+- Recruiter
+- Interview
+- Offer
+- Accepted
+- Declined
+
+**Example Source options:**
+- Direct Apply
+- Recruiter
+- Referral
+- Job Board
+
+> 💡 You can customize these values, but make sure to update the code in `app.py` accordingly if you change the property names.
+
 
 ## Run the App
 
