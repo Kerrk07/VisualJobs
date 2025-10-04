@@ -1,109 +1,57 @@
 # VisualJobs
 
-**VisualJobs** is a personal dashboard built just for fun to help visualize my job hunting process.
+A personal dashboard to visualize job hunting progress using Notion data and Plotly Sankey diagrams.
 
-It pulls data from a Notion database and generates a Sankey diagram to show how applications flow through various stages — from Applied to Recruiter, Rejected, Interviews, Offers, and more. Alongside, it provides simple metrics like response rate and offer rate.
+## Overview
 
-This project is not meant for production or professional use — it's just a fun way to learn Dash, Plotly, and the Notion API while reflecting on my job search.
+VisualJobs pulls data from a Notion database and generates visualizations showing how job applications flow through various stages (Applied, Recruiter, Interview, Offer, etc.). It also displays metrics like response rate and offer rate.
 
+## Setup
 
-## Project Structure
-
-```
-VisualJobs/
-│
-├── app.py              # Main Dash app
-├── requirements.txt    # Python dependencies
-├── .env                # Notion API credentials (not tracked by Git)
-├── .gitignore          # Git exclusions for env, cache, and system files
-├── README.md           # Project overview and usage
-└── images/
-    └── web.png         # Dashboard screenshot
-```
-
-## What This Is For
-
-Job hunting can be chaotic. VisualJobs helps you:
-- Record your job applications in **Notion**
-- Understand where your efforts are paying off (e.g., recruiter vs. direct apply)
-- Track outcomes like **offers** and **responses**
-- Stay motivated with data-backed insights
-
-
-
-## Setup Instructions
-
-### 1. Clone the Repo
+### 1. Clone and Install
 
 ```bash
 git clone https://github.com/yourusername/visualjobs.git
 cd visualjobs
-````
-
-### 2. Create a Conda Environment (recommended)
-
-```bash
 conda create -n visualjobs python=3.10
 conda activate visualjobs
 pip install -r requirements.txt
 ```
 
-### 3. Add a `.env` File
+### 2. Configure Notion
 
-Create a `.env` file in the root with:
+Create a `.env` file:
 
-```dotenv
-NOTION_API_KEY=secret_xxx_from_notion_integration
-NOTION_DATABASE_ID=your_database_id_here
+```
+NOTION_API_KEY=your_notion_integration_key
+NOTION_DATABASE_ID=your_database_id
 ```
 
-> ✅ Make sure your Notion integration is shared with the database!
+Ensure your Notion integration has access to the database.
 
-### 4. Design Your Notion Database
+### 3. Notion Database Schema
 
-Your Notion database should have the following properties to work with VisualJobs:
+Required properties:
 
-| Property Name | Type | Description |
-|---------------|------|-------------|
-| **Company** | Title | Name of the company |
-| **Status** | Select | Current application status (e.g., Applied, Rejected, Interview, Offer) |
-| **Source** | Select | How you applied (e.g., Direct Apply, Recruiter, Referral) |
-| **Applied Date** | Date | When you submitted the application |
+| Property | Type | Description |
+|----------|------|-------------|
+| Company | Title | Company name |
+| Status | Select | Application status |
+| Source | Select | Application source |
+| Applied Date | Date | Application date |
 
-**Example Status options:**
-- Applied
-- Rejected
-- Recruiter
-- Interview
-- Offer
-- Accepted
-- Declined
+Example Status values: Applied, Rejected, Recruiter, Interview, Offer, Accepted, Declined
 
-**Example Source options:**
-- Direct Apply
-- Recruiter
-- Referral
-- Job Board
+Example Source values: Direct Apply, Recruiter, Referral, Job Board
 
-> 💡 You can customize these values, but make sure to update the code in `app.py` accordingly if you change the property names.
-
-
-## Run the App
+## Usage
 
 ```bash
 python app.py
 ```
 
-Then open your browser to:
-📍 `http://127.0.0.1:8050`
+Open `http://127.0.0.1:8050` in your browser.
 
-## Example Dashboard
+## License
 
-![VisualJobs Sankey Diagram](images/web.png)
-
-
-## 🧪 Disclaimer
-
-This project is for **personal learning and visualization only**. It is not optimized for general use or production deployment. You're welcome to fork or adapt it for your own fun projects.
-
-
+MIT
